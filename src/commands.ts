@@ -1,6 +1,7 @@
 import type { CommandGroup } from "@xmtp/message-kit";
 import { handler as agent } from "./handler/agent.js";
 import { handler as games } from "./handler/game.js";
+import { handler as subscribeHandler } from "./handler/subscribe.js";
 import { handler as getPendingTx } from "./handler/getPendingTx.js";
 import { handler as executeTx } from "./handler/executeTx.js";
 
@@ -70,6 +71,20 @@ export const commands: CommandGroup[] = [
             type: "prompt",
           },
         },
+      },
+    ],
+  },
+  {
+    name: "Subscribe",
+    triggers: ["/subscribe"],
+
+    description: "Subscribe to the bot.",
+    commands: [
+      {
+        command: "/subscribe",
+        handler: subscribeHandler,
+        description: "Subscribe to the bot.",
+        params: {},
       },
     ],
   }

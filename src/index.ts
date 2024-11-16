@@ -1,6 +1,7 @@
 import { run } from "@xmtp/message-kit";
 import type { HandlerContext } from "@xmtp/message-kit";
 import { handler as agent } from "./handler/agent.js";
+import { handler as subscribeHandler } from "./handler/subscribe.js";
 import { handler as getPendingTx } from "./handler/getPendingTx.js";
 import { ethers } from "ethers";
 
@@ -83,6 +84,10 @@ async function handleTextMessage(context: HandlerContext) {
 
     case text.startsWith("@agent"):
       await agent(context);
+      break;
+
+    case text.startsWith("/subscribe"):
+      await subscribeHandler(context);
       break;
 
     case text.includes("/pending"):
