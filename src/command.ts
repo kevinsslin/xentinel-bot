@@ -1,99 +1,76 @@
-import { run } from "@xmtp/message-kit";
-import type { HandlerContext } from "@xmtp/message-kit";
+import type { CommandGroup } from "@xmtp/message-kit";
 import { handler as agent } from "./handler/agent.js";
+import { handler as games } from "./handler/game.js";
 import { handler as getPendingTx } from "./handler/getPendingTx.js";
-import { ethers } from "ethers";
+import { handler as executeTx } from "./handler/executeTx.js";
 
-// Main function to run the app
-run(async (context: HandlerContext) => {
-  const {
-    message: { typeId },
-  } = context;
-  switch (typeId) {
-    case "reaction":
-      handleReaction(context);
-      break;
-    case "reply":
-      handleReply(context);
-      break;
-    case "text":
-      handleTextMessage(context);
-      break;
+export const commands: CommandGroup[] = [
+  {
+    name: "Execute Transaction",
+    triggers: ["/execute", "@execute"],
+    description: "Execute a signed Safe transaction",
+    commands: [
+      {
+        command: "/execute [safe_tx_hash]",
+        description: "Execute a Safe transaction that has collected required signatures.",
+        handler: executeTx,
+        params: {
+          safeTxHash: {
+            default: "",
+            type: "string",
+          },
+        },
+      },
+    ],
+  },
+  {
+    name: "Pending Transactions",
+    triggers: ["/pending", "@pending"],
+    description: "View pending Safe transactions",
+    commands: [
+      {
+        command: "/pending",
+        description: "Get list of pending transactions for the Safe",
+        handler: getPendingTx,
+        params: {},
+      }
+    ],
+  },
+  {
+    name: "Games",
+    triggers: ["/game", "@game", "🔎", "🔍"],
+    description: "Provides various gaming experiences.",
+    commands: [
+      {
+        command: "/game [game]",
+        handler: games,
+        description: "Play a game.",
+        params: {
+          game: {
+            default: "",
+            type: "string",
+            values: ["wordle", "slot", "help"],
+          },
+        },
+      },
+    ],
+  },
+  {
+    name: "Agent",
+    triggers: ["/agent", "@agent", "@bot"],
+    description: "AI assistant for help and commands.",
+    commands: [
+      {
+        command: "/agent [prompt]",
+        handler: agent,
+        description: "Ask the AI agent for help.",
+        params: {
+          prompt: {
+            default: "",
+            type: "prompt",
+          },
+        },
+      },
+    ],
   }
-});
-
-async function handleReply(context: HandlerContext) {
-  const {
-    v2client,
-    getReplyChain,
-    version,
-    message: {
-      content: { reference },
-    },
-  } = context;
-
-  const { chain, isSenderInChain } = await getReplyChain(
-    reference,
-    version,
-    v2client.address,
-  );
-  console.log(chain);
-  handleTextMessage(context);
-}
-// Handle reaction messages
-async function handleReaction(context: HandlerContext) {
-  const {
-    v2client,
-    getReplyChain,
-    version,
-    message: {
-      content: { content: emoji, action, reference },
-    },
-  } = context;
-
-  const { chain, isSenderInChain } = await getReplyChain(
-    reference,
-    version,
-    v2client.address,
-  );
-  console.log(chain);
-}
-
-// Handle text messages
-async function handleTextMessage(context: HandlerContext) {
-  const {
-    message: {
-      content: { content: text },
-      sender: { address, username }
-    },
-  } = context;
-
-  // console.log(`Message received from ${username} (${address}): ${text}`);
-
-  console.log("Received text:", text);
-
-  const wallet = new ethers.Wallet(process.env.KEY);
-
-  if (text.includes("/help")) {
-    await helpHandler(context);
-  } else if (text.startsWith("@agent")) {
-    await agent(context);
-  } else if (text.includes("/pending")) {
-    await getPendingTx(context);
-  } else if (context.message.sender.address !== wallet.address) {
-      console.log("Routing to intent:", text);
-    await context.intent(text);
-  }
-}
-
-export async function helpHandler(context: HandlerContext) {
-  const { commands = [] } = context;
-  const intro = `Available experiences:
-${commands
-  .flatMap((app) => app.commands)
-  .map((command) => `${command.command} - ${command.description}`)
-  .join("\n")}
-Use these commands to interact with specific apps.`;
-  
-  context.send(intro);
-}
+];
