@@ -1,14 +1,16 @@
 import { run } from "@xmtp/message-kit";
 import type { HandlerContext } from "@xmtp/message-kit";
-import { handler as agent } from "./handler/agent.ts";
-import { handler as getPendingTx } from "./handler/getPendingTx.ts";
+import { handler as agent } from "./handler/agent.js";
+import { handler as getPendingTx } from "./handler/getPendingTx.js";
 import { ethers } from "ethers";
 
 // Main function to run the app
 run(async (context: HandlerContext) => {
+
   const {
     message: { typeId },
   } = context;
+  
   switch (typeId) {
     case "reaction":
       handleReaction(context);
@@ -72,17 +74,26 @@ async function handleTextMessage(context: HandlerContext) {
 
   console.log("Received text:", text);
 
-  const wallet = new ethers.Wallet(process.env.KEY);
+  const wallet = new ethers.Wallet(`${process.env.KEY}`);
 
-  if (text.includes("/help")) {
-    await helpHandler(context);
-  } else if (text.startsWith("@agent")) {
-    await agent(context);
-  } else if (text.includes("/pending")) {
-    await getPendingTx(context);
-  } else if (context.message.sender.address !== wallet.address) {
-      console.log("Routing to intent:", text);
-    await context.intent(text);
+  switch (true) {
+    case text.includes("/help"):
+      await helpHandler(context);
+      break;
+
+    case text.startsWith("@agent"):
+      await agent(context);
+      break;
+
+    case text.includes("/pending"):
+      await getPendingTx(context);
+      break;
+
+    default:
+      if (context.message.sender.address !== wallet.address) {
+        console.log("Routing to intent:", text);
+        await context.intent(text);
+      }
   }
 }
 
