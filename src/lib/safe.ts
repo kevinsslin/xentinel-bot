@@ -1,6 +1,7 @@
-import SafeApiKit from '@safe-global/api-kit';
-import Safe from '@safe-global/protocol-kit';
-import type { MetaTransactionData } from "@safe-global/types-kit";
+import * as SafeApiKit from '@safe-global/api-kit';
+import * as Safe from '@safe-global/protocol-kit';
+import type { SafeTransaction, SafeTransactionData, MetaTransactionData } from '@safe-global/types-kit';
+import type { TransactionResponse } from '@ethersproject/abstract-provider';
 
 export function validateSafeEnvironment() {
   const missingVars = [];
@@ -40,7 +41,7 @@ export async function createTransaction(transactions: MetaTransactionData[]) {
   return await protocolKit.createTransaction({ transactions });
 }
 
-export async function getTransactionHash(transaction: any) {
+export async function getTransactionHash(transaction: SafeTransaction) {
   const protocolKit = await getSafeProtocolKit();
   return await protocolKit.getTransactionHash(transaction);
 }
@@ -68,7 +69,7 @@ export async function confirmTransaction(safeTxHash: string, signature: string) 
 
 export async function proposeTransaction(params: {
   safeAddress: string;
-  safeTransactionData: any;
+  safeTransactionData: SafeTransactionData;
   safeTxHash: string;
   senderAddress: string;
   senderSignature: string;
@@ -91,5 +92,6 @@ export async function executeTransaction(safeTxHash: string) {
   
   const safeTransaction = await apiKit.getTransaction(safeTxHash);
   const executeTxResponse = await protocolKit.executeTransaction(safeTransaction);
-  return await executeTxResponse.transactionResponse?.wait();
+  const txResponse = executeTxResponse.transactionResponse as TransactionResponse;
+  return await txResponse?.wait();
 } 
