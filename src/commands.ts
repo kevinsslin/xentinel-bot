@@ -1,11 +1,57 @@
 import type { CommandGroup } from "@xmtp/message-kit";
 import { handler as agent } from "./handler/agent.js";
 import { handler as games } from "./handler/game.js";
+import { handler as propose } from "./handler/propose.js";
 import { handler as subscribeHandler } from "./handler/subscribe.js";
 import { handler as getPendingTx } from "./handler/getPendingTx.js";
+import { handler as signTx } from "./handler/signTx.js";
 import { handler as executeTx } from "./handler/executeTx.js";
 
 export const commands: CommandGroup[] = [
+  {
+    name: "Propose Transaction",
+    triggers: ["/propose", "@propose"],
+    description: "Propose a new transaction to the Safe wallet",
+    commands: [
+      {
+        command: "/propose [to] [ether_amount] [data]",
+        description: "Propose a transaction to the Safe with a specified target address, amount in ETH, and data.",
+        handler: propose,
+        params: {
+          to: {
+            default: "0x",
+            type: "string",
+          },
+          ether_amount: {
+            default: 0.000000000000000001, // 1 wei
+            type: "number",
+          },
+          data: {
+            default: "0x",
+            type: "string",
+          },
+        },
+      },
+    ],
+  },
+  {
+    name: "Sign Transaction",
+    triggers: ["/sign", "@sign"],
+    description: "Sign a pending Safe transaction",
+    commands: [
+      {
+        command: "/sign [safe_tx_hash]",
+        description: "Sign a pending Safe transaction using its hash.",
+        handler: signTx,
+        params: {
+          safeTxHash: {
+            default: "",
+            type: "string",
+          },
+        },
+      },
+    ],
+  },
   {
     name: "Execute Transaction",
     triggers: ["/execute", "@execute"],
