@@ -3,6 +3,7 @@ import type { HandlerContext } from "@xmtp/message-kit";
 import { handler as agent } from "./handler/agent.js";
 import { handler as subscribeHandler } from "./handler/subscribe.js";
 import { handler as getPendingTx } from "./handler/getPendingTx.js";
+import { handler as signTx } from "./handler/signTx.js";
 import { ethers } from "ethers";
 
 // Main function to run the app
@@ -78,27 +79,33 @@ async function handleTextMessage(context: HandlerContext) {
   const wallet = new ethers.Wallet(`${process.env.KEY}`);
 
   switch (true) {
-    case text.includes("/help"):
+    case text.includes("/help") && process.env.webhook === "true":
       await helpHandler(context);
       break;
 
-    case text.startsWith("@agent"):
+    case text.startsWith("@agent") && process.env.webhook === "true":
       await agent(context);
       break;
 
-    case text.startsWith("/subscribe"):
+    case text.startsWith("/subscribe") && process.env.webhook === "true":
       await subscribeHandler(context);
       break;
 
-    case text.includes("/pending"):
+    case text.includes("/pending") && process.env.webhook === "true":
       await getPendingTx(context);
       break;
 
-    default:
-      if (context.message.sender.address !== wallet.address) {
-        console.log("Routing to intent:", text);
-        await context.intent(text);
-      }
+    case text.startsWith("/sign"):
+      await signTx(context);
+      break;
+
+    // default:
+    //   if (context.message.sender.address !== wallet.address) {
+    //     console.log("Routing to intent:", text);
+    //     await context.intent(text);
+      // }
+      default:
+        ;
   }
 }
 

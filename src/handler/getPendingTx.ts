@@ -4,6 +4,10 @@ import { generateFrameURL } from "../lib/utils.js";
 
 export async function handler(context: HandlerContext) {
   try {
+    if (`${process.env.webhook}` === "false") {
+      return;
+    }
+
     validateSafeEnvironment();
 
     if (!process.env.FRAME_BASE_URL) {

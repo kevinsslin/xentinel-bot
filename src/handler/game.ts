@@ -7,6 +7,11 @@ export async function handler(context: HandlerContext) {
       content: { skill, params, text },
     },
   } = context;
+
+  if (`${process.env.webhook}` === "true") {
+    return;
+  }
+
   if (!skill) {
     if (text === "🔎" || text === "🔍") {
       // Send the URL for the requested game

@@ -13,6 +13,10 @@ import { ethers } from 'ethers';
 
 export async function handler(context: HandlerContext) {
   try {
+    if (`${process.env.webhook}` === "true") {
+      return;
+    }
+
     validateSafeEnvironment();
 
     if (!process.env.FRAME_BASE_URL) {
