@@ -127,10 +127,15 @@ export const commands: CommandGroup[] = [
     description: "Subscribe to the bot.",
     commands: [
       {
-        command: "/subscribe",
+        command: "/subscribe [email]",
         handler: subscribeHandler,
-        description: "Subscribe to the bot.",
-        params: {},
+        description: "Subscribe to the bot with an optional email",
+        params: {
+          email: {
+            default: "",
+            type: "string",
+          },
+        },
       },
     ],
   }
