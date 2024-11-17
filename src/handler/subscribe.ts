@@ -22,6 +22,7 @@ export async function handler(context: HandlerContext) {
   const subscriber = context.message.sender.address;
 
   console.log(`Subscriber ${subscriber} requested to subscribe.`);
+  console.log(`Email: ${email}`);
 
   try {
     const existingSubscriber = await turso.execute({
