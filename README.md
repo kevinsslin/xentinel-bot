@@ -1,36 +1,99 @@
-# xentinel-bot
+# Xentinel Agent
 
-This project is powered by [MessageKit](https://messagekit.ephemerahq.com/) 
+Your go-to agent for streamlined multisig operations and post-deployment monitoring. Xentinel Agent enables seamless Gnosis Safe management and on-chain transaction monitoring through intuitive chat commands with Frame integration for visualizing the transaction lifecycle.
+
+## Features
+
+- **Safe Transaction Management**
+  - Propose new transactions (`/propose`)
+  - Sign pending transactions (`/sign`)
+  - Execute signed transactions (`/execute`)
+  - Review pending transactions (`/pending`)
+- **Frame Integration**
+  - Rich transaction previews
+  - Real-time status updates
+  - Interactive confirmation flows
+- **AI-Powered Assistant**
+  - Smart command suggestions
+  - Transaction analysis and help
+  - Context-aware assistance
+- **Monitoring & Alerts**
+  - Transaction status tracking
+  - Signature collection progress
+  - Execution confirmations
+
+## Prerequisites
+
+- [Bun](https://bun.sh) >= 1.0.0
+- Node.js >= 20.0.0
 
 ## Setup
 
-Follow these steps to set up and run the project:
+1. **Clone the repository:**
+   ```sh
+   git clone <repository-url>
+   cd xentinel-agent
+   ```
 
-1. **Navigate to the project directory:**
+2. **Install dependencies:**
+   ```sh
+   bun install
+   ```
 
-```sh
-cd ./xentinel-bot
+3. **Environment Configuration:**
+   ```sh
+   cp .env.example .env
+   ```
+   Configure your environment variables in `.env`:
+   ```sh
+   # Bot Configuration
+   KEY=                  # Bot wallet private key (with 0x prefix)
+   SIGNER_PRIVATE_KEY=   # Bot wallet private key (with 0x prefix)
+   MSG_LOG=true         # Enable message logging
+
+   # Safe Configuration  
+   SAFE_ADDRESS=        # Your Gnosis Safe contract address
+   CHAIN_ID=           # Network chain ID
+   RPC_URL=            # Your RPC endpoint URL
+
+   # Frame Configuration
+   FRAME_BASE_URL=     # Your Frame integration base URL
+   
+   # Database Configuration
+   TURSO_DATABASE_URL= # Turso database URL
+   TURSO_AUTH_TOKEN=   # Turso authentication token
+   
+   # Webhook
+   WEB_HOOK=false     # Enable/disable webhook
+   ```
+
+4. **Start the service:**
+   ```sh
+   bun dev
+   ```
+
+## Command Reference
+
+### Multisig Operations
+- `/propose [to] [ether_amount] [data]` - Create new transaction proposal
+- `/sign [safe_tx_hash]` - Sign pending transaction
+- `/execute [safe_tx_hash]` - Execute fully signed transaction
+- `/pending` - View all pending transactions
+
+### AI Assistant
+- `/agent [prompt]` - Get AI-powered assistance
+
+## Project Structure
+```
+src/
+├── handler/ # Command handlers and business logic
+├── lib/ # Core utilities and shared functions
+└── index.ts # Application entry point
 ```
 
-2. **Set up your environment variables:**
+## License
 
-```sh
-KEY= # the private key of the agent wallet 
-OPEN_AI_API_KEY= # openai api key
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-3. **Install dependencies:**
-
-```sh
-yarn@1.1.31 install
-```
-
-4. **Run the project:**
-
-```sh
-yarn@1.1.31 dev
-```
-
-5. Enjoy!
 ---
-Made with ❤️ by [XMTP](https://xmtp.org)
+Built with ❤️ using [MessageKit](https://message-kit.vercel.app), [XMTP](https://xmtp.org) and [Base](https://base.org)
